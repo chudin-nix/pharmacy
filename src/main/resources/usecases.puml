@@ -1,0 +1,33 @@
+@startuml
+title Варианты использования для онлайн аптеки
+
+left to right direction
+
+actor "Пользователь" as User
+actor "Врач" as Doctor
+actor "Фармацевт" as Pharmacist
+
+usecase "Выбор необходимого препарата" as ChooseMedicine
+usecase "Заполняет форму заказа" as FillOutOrderForm
+usecase "Оплачивает заказ" as PaymentOrder
+usecase "Управляет списком препаратов" as ManagmentMedicineList
+usecase "Назначает электронный рецепт" as PrescribePrescription
+usecase "Делает запрос на продление рецепта" as RequestRenewalPrescription
+
+User --> ChooseMedicine
+ChooseMedicine ..> FillOutOrderForm : include
+
+Pharmacist --> ManagmentMedicineList
+
+User --> RequestRenewalPrescription
+
+Doctor --> PrescribePrescription
+
+User --> PaymentOrder
+
+
+
+
+
+
+@enduml
