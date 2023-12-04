@@ -21,18 +21,21 @@ public class LoginCommand implements Command {
     }
 
     @Override
-    public String execute(HttpServletRequest req, HttpServletResponse resp) throws ServiceException {
+    public CommandResult execute(HttpServletRequest req, HttpServletResponse resp) throws ServiceException {
         String login = req.getParameter("login");
         String password = req.getParameter("password");
         Optional<User> user = userService.login(login, password);
+        CommandResult result;
         if (user.isPresent()) {
-            req.getSession().setAttribute("user", user.get().getLogin());
+            req.getSession().setAttribute("user_login", user.get().getLogin());
+            req.getSession().setAttribute("user_id", user.get().getId());
             List<Medicine> medicineList = medicineService.findAll();
             req.setAttribute("medicineList", medicineList);
-            return "/WEB-INF/view/main.jsp";
+            return CommandResult.forward("/WEB-INF/view/main.jsp");
         } else {
             req.setAttribute("errorMessage", "Invalid credentials");
-            return "index.jsp";
+            result = CommandResult.forward("/index.jsp");
         }
+        return result;
     }
 }

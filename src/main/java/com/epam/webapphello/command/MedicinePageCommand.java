@@ -18,15 +18,18 @@ public class MedicinePageCommand implements Command{
     }
 
     @Override
-    public String execute(HttpServletRequest req, HttpServletResponse resp) throws ServiceException, DaoException {
-        String id = req.getParameter("id");
-        Optional<Medicine> medicine = medicineService.findMedicineById(id);
+    public CommandResult execute(HttpServletRequest req, HttpServletResponse resp) throws ServiceException, DaoException {
+        Integer id = Integer.parseInt(req.getParameter("id"));
+        Optional<Medicine> medicine = medicineService.findById(id);
+        CommandResult result;
         if (medicine.isPresent()) {
             req.setAttribute("medicine", medicine.get());
-            return "/WEB-INF/view/medicine.jsp";
+            result = CommandResult.forward("/WEB-INF/view/medicine.jsp");
+            return result;
         } else {
             req.setAttribute("errorMessage", "Invalid credentials");
-            return "index.jsp";
+            result = CommandResult.forward("/WEB-INF/view/medicine.jsp");
+            return result;
         }
     }
 }

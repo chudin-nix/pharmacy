@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MedicineService {
-    Optional<Medicine> findMedicineById(String id) throws ServiceException, DaoException;
+    Optional<Medicine> findById(Integer id) throws ServiceException;
 
     List<Medicine> findAll() throws ServiceException;
 }

@@ -2,17 +2,16 @@ package com.epam.webapphello.dao;
 
 import com.epam.webapphello.exception.DaoException;
 
-import java.sql.ResultSet;
 import java.util.List;
 import java.util.Optional;
 
 //CRUD
 public interface Dao<T> {
-    Optional<T> getById(Long id);
+    Optional<T> findById(Integer id) throws DaoException;
 
-    List<T> getAll() throws DaoException;
+    List<T> findAll() throws DaoException;
 
-    void save(T item);
+    void save(Optional<T> item) throws DaoException;
 
-    void removeById(Long id);
+    void removeById(Integer id) throws DaoException;
 }

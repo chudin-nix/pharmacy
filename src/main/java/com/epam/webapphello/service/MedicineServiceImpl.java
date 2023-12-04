@@ -8,18 +8,22 @@ import com.epam.webapphello.exception.ServiceException;
 import java.util.List;
 import java.util.Optional;
 
-public class SimpleMedicineService implements MedicineService {
+public class MedicineServiceImpl implements MedicineService {
 
-    private MedicineDao<Medicine> dao;
+    private MedicineDao dao;
 
-    public SimpleMedicineService(MedicineDao<Medicine> dao) {
+    public MedicineServiceImpl(MedicineDao dao) {
         this.dao = dao;
     }
 
 
     @Override
-    public Optional<Medicine> findMedicineById(String id) throws ServiceException, DaoException {
-        return dao.findMedicineById(id);
+    public Optional<Medicine> findById(Integer id) throws ServiceException {
+        try {
+            return dao.findById(id);
+        } catch (DaoException e) {
+            throw new ServiceException(e);
+        }
     }
 
     @Override

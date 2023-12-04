@@ -12,12 +12,17 @@ import java.util.List;
 import java.util.Optional;
 
 public abstract class AbstractDao<Type> {
+    private Connection connection;
     protected abstract Type map(ResultSet resultSet) throws SQLException;
+
+
+    public AbstractDao(Connection connection) {
+        this.connection = connection;
+    }
 
     protected List<Type> executeQuery(String query, List<Object> params) throws DaoException {
         List<Type> elements = new ArrayList<>();
-        try (Connection connection = ConnectionPool.getInstance().getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
             for (int i = 1; i <= params.size() ; i++) {
                 statement.setObject(i, params.get(i-1));
             }
@@ -32,27 +37,63 @@ public abstract class AbstractDao<Type> {
         return elements;
     }
 
+    protected void executeUpdate(String query, List<Object> params) throws DaoException {
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            for (int i = 1; i <= params.size() ; i++) {
+                statement.setObject(i, params.get(i-1));
+            }
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        }
+    }
     protected Optional<Type> executeQueryForSingleResult(String query, List<Object> params) throws DaoException {
         List<Type> elements = executeQuery(query, params);
         return elements.isEmpty() ? Optional.empty() : Optional.of(elements.get(0));
     }
 
-    protected List<Type> findAll(String tableName) throws DaoException {
+    public List<Type> findAll() throws DaoException {
         //вот пустой список параметров, не совсем уверен, что это верно
         List<Object> params = new ArrayList<>();
-        String query = "SELECT * FROM " + tableName;
+        String query = "SELECT * FROM " + getTableName();
         return executeQuery(query, params);
     }
 
-    protected Type findById(String tableName, int id) throws DaoException {
-        String query = "SELECT * FROM " + tableName + " WHERE id = " + id;
+    public Optional<Type> findById(Integer id) throws DaoException {
+        String query = "SELECT * FROM " + getTableName() + " WHERE id = " + id;
         List<Object> params = new ArrayList<>();
         params.add(id);
         List<Type> result = executeQuery(query, params);
         if (result.isEmpty()) {
-            return null;
+            return Optional.empty();
         } else {
-            return result.get(0);
+            return Optional.of(result.get(0));
         }
     }
+
+    public void removeById(Integer id) {
+
+    }
+    protected abstract String getTableName();
+
+
+//    private String generateInsertQuery( Map<String, Object> fields) {
+//        throw new UnsupportedOperationException();
+//    }
+//
+//    private String generateUpdateQuery( Map<String, Object> fields) {
+//        throw new UnsupportedOperationException();
+//    }
+
+//    @Override
+//    public void save(Type item) {
+//        Map<String, Object> fields = getFields(item);
+//        String query = item.getId() == null ? generateInsertQuery(fields) : generateUpdateQuery(fields);
+//        executeUpdate(query);
+//        if (item.getId() = null) {
+//            //insert
+//        } else {
+//            //update
+//        }
+//    }
 }
